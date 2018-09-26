@@ -40,15 +40,21 @@ end
 
 class SmokeTest < Minitest::Test
   def test_sql_facet_with_belongs_to
-    search = MovieSearch.new({ 'studio-uschis' => {} })
+    search = MovieSearch.new("search" => { })
     assert_equal Movie.count, search.result.size
     assert_equal search.filter(%i[studio uschis]).facet,
                  [FortyFacets::FacetValue.new(:uschis, 0, false), FortyFacets::FacetValue.new(:non_uschis, 40, false)]
+
+    search = MovieSearch.new("search" => { "studio-uschis" => "uschis" })
+    assert_equal 0, search.result.size
+
+    search = MovieSearch.new("search" => { "studio-uschis" => "non_uschis" })
+    assert_equal Movie.count, search.result.size
   end
 
   def test_it_finds_all_movies
     search = MovieSearch.new({})
-    assert_equal Movie.all.size, search.result.size
+    assert_equal Movie.count, search.result.size
   end
 
   def test_scope_filter
