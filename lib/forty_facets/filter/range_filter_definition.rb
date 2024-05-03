@@ -47,6 +47,22 @@ module FortyFacets
       private
 
       def range_values
+        date_time_values || date_values || number_values
+      end
+
+      def date_time_values
+        date_time_regex = Regexp.new(/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/)
+        date_time_regex_range = Regexp.new(/#{date_time_regex} - #{date_time_regex}/)
+        value&.match(date_time_regex_range)&.captures
+      end
+
+      def date_values
+        date_regex = Regexp.new(/(\d{4}-\d{2}-\d{2})/)
+        date_regex_range = Regexp.new(/#{date_regex} - #{date_regex}/)
+        value&.match(date_regex_range)&.captures
+      end
+
+      def number_values
         value&.match(RANGE_REGEX)&.captures
       end
     end
