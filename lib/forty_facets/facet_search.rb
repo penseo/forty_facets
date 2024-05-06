@@ -117,14 +117,9 @@ module FortyFacets
 
     def result(skip_ordering: false)
       query = @filters.reject(&:empty?).inject(root) do |previous, filter|
-        # p 'PREVIOS'
-        # p previous 
-        # p 'FILTER'
-        # p filter 
-        # p '..........'
         filter.build_scope.call(previous)
       end
-      
+
       if order && !skip_ordering
         query = order.apply(query)
       else
@@ -184,4 +179,3 @@ module FortyFacets
 
   end
 end
-
