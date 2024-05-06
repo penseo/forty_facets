@@ -6,7 +6,7 @@ module FortyFacets
       @search = search
       @queries = queries
       @path = Array(opts[:path]) if opts[:path].present?
-      @joins = Array(opts[:joins]) if opts[:joins].present?
+      @joins = opts[:joins].present? ? Array(opts[:joins]) : []
       @path ||= @queries.keys
       @options = opts
     end
@@ -31,7 +31,7 @@ module FortyFacets
           # intersection of values and definition queries
           base.where(selected_queries.values.map do |query|
             "(#{query})"
-          end.join(" OR "))
+          end.join(" OR ")).joins(definition.joins)
         end
       end
 
@@ -59,11 +59,11 @@ module FortyFacets
           "(#{sql_query}) as #{key}"
         end.join(", ")
         query += ", count(*) as occurrences"
-
+        
         counts = without.result.reorder("")
           .select(query)
           .group(definition.queries.keys)
-        counts = counts.joins(definition.joins) if definition.joins
+          .joins(definition.joins)
         counts.includes_values = []
 
         result = {}

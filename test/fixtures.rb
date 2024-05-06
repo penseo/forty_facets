@@ -14,6 +14,7 @@ ActiveRecord::Schema.define do
     t.string :status
     t.string :name
     t.string :description
+    t.datetime :deleted_at
   end
 
   create_table :producers do |t|
@@ -79,16 +80,20 @@ end
 class Studio < ActiveRecord::Base
   belongs_to :country
   has_and_belongs_to_many :producers
+
+  default_scope ->{ where(deleted_at: nil) }
+  scope :with_deleted, ->{ unscope(where: :deleted_at) }
 end
 
 class Movie < ActiveRecord::Base
-  belongs_to :studio
+  belongs_to :studio, ->{ with_deleted }
   has_and_belongs_to_many :genres
   has_and_belongs_to_many :actors
   has_and_belongs_to_many :writers
 
   scope :classics, -> { where("year <= ?", 1980) }
   scope :non_classics, -> { where("year > ?", 1980) }
+  scope :year_lte, -> (year) { where("year > ?", year) }
 end
 
 LOREM = %w{Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren}

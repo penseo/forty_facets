@@ -179,4 +179,3 @@ module FortyFacets
 
   end
 end
-

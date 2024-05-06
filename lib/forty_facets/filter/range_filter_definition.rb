@@ -1,27 +1,39 @@
+# frozen_string_literal: true
+
 module FortyFacets
   class RangeFilterDefinition < FilterDefinition
     class RangeFilter < Filter
-      def build_scope
-        return Proc.new { |base| base } if empty?
+      RANGE_REGEX = /(\d*) - (\d*)/
 
-        Proc.new do |base|
-          base.joins(definition.joins)
-            .where("#{definition.qualified_column_name} >= ? AND #{definition.qualified_column_name} <= ? ", min_value, max_value ) 
+      def build_scope
+        return proc { |base| base } if empty?
+
+        proc do |base|
+          scope = base.joins(definition.joins)
+          scope = scope.where("#{definition.qualified_column_name} >= ?", min_value) if min_value.present?
+          scope = scope.where("#{definition.qualified_column_name} <= ?", max_value) if max_value.present?
+          scope
         end
       end
 
       def min_value
-        return nil if empty?
-        value.split(' - ').first
+        min, _max = range_values
+        min
       end
 
       def max_value
-        return nil if empty?
-        value.split(' - ').last
+        _min, max = range_values
+        max
       end
 
       def absolute_interval
-        @abosultes ||= without.result.reorder('').select("min(#{definition.qualified_column_name}) AS min, max(#{definition.qualified_column_name}) as max").first
+        @abosultes ||=
+          without
+          .result
+          .reorder('')
+          .select("min(#{definition.qualified_column_name}) AS min, max(#{definition.qualified_column_name}) as max")
+          .order("min(#{definition.qualified_column_name})")
+          .first
       end
 
       def absolute_min
@@ -32,6 +44,27 @@ module FortyFacets
         absolute_interval.max
       end
 
+      private
+
+      def range_values
+        date_time_values || date_values || number_values
+      end
+
+      def date_time_values
+        date_time_regex = Regexp.new(/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/)
+        date_time_regex_range = Regexp.new(/#{date_time_regex} - #{date_time_regex}/)
+        value&.match(date_time_regex_range)&.captures
+      end
+
+      def date_values
+        date_regex = Regexp.new(/(\d{4}-\d{2}-\d{2})/)
+        date_regex_range = Regexp.new(/#{date_regex} - #{date_regex}/)
+        value&.match(date_regex_range)&.captures
+      end
+
+      def number_values
+        value&.match(RANGE_REGEX)&.captures
+      end
     end
 
     def build_filter(search_instance, value)

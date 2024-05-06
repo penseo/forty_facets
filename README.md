@@ -7,10 +7,10 @@
 
 FortyFacets lets you easily build explorative search interfaces based on fields of your ActiveRecord models.
 
-![demo](https://raw.githubusercontent.com/fortytools/forty_facets/master/demo.gif)
+![demo](./demo.gif)
 
-See it implemented in a [example rails application](https://github.com/fortytools/forty_facets_demo) or
-try a [working demo](http://forty-facets-demo.herokuapp.com/ "Testinstallation on heroku")!
+See it implemented in a [example rails application](https://github.com/FortySource/forty_facets_demo/tree/main) or
+~~try a [working demo]( https://forty-facets.herokuapp.com/ "Testinstallation on heroku")!~~ (Heroku isn't offering free tires anymore 😢)
 
 It offers a simple API to create an interactive UI to browse your data by iteratively adding
 filter values.
