@@ -3,7 +3,7 @@
 module FortyFacets
   class RangeFilterDefinition < FilterDefinition
     class RangeFilter < Filter
-      RANGE_REGEX = /(\d*) - (\d*)/
+      RANGE_REGEX = /([\d,.]*) - ([\d,.]*)/
 
       def build_scope
         return proc { |base| base } if empty?

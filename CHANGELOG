@@ -2,6 +2,10 @@
 
 ## 0.2.1
 
+- support of decimal number ranges
+
+## 0.2.1
+
 - added "ORDER" to Range query to fix integration with Postgres
 
 ## 0.2
