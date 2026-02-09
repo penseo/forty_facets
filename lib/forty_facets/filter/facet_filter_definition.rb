@@ -50,7 +50,7 @@ module FortyFacets
       def selected
         entity = definition.origin_class
         column = entity.columns_hash[definition.attribute.to_s]
-        type = entity.connection.lookup_cast_type_from_column(column)
+        type = column.fetch_cast_type(entity.lease_connection)
         values.map { |value| type.serialize(value) }
       end
 
